@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>분석 페이지</title>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Intro Section -->
+<section class="intro-section text-center bg-dark text-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+		  <h1 class="display-6">혈당예측 김다정 </h1>
+                <!--<p class="lead"> <a href="https://www.youtube.com/hkcode" style="color: yellow;">www.youtube.com/hkcode </a></p>-->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 탭 메뉴 추가 -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="new-tab" data-toggle="tab" href="#new" role="tab" aria-controls="new" aria-selected="true">공복 혈당 예측</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="analysis-tab" data-toggle="tab" href="#analysis" role="tab" aria-controls="analysis" aria-selected="false">식후 혈당 예측</a>
+    </li>
+</ul>
+
+   
+
+<!-- 탭 내용 추가 -->
+<div class="tab-content" id="myTabContent">
+
+    <div class="tab-pane fade show active" id="new" role="tabpanel" aria-labelledby="new-tab">
+        
+        <!-- 첫번째 탭  -->
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h1 class="mb-3 text-center" style="font-size: 20px;"  > 공복 혈당 예측 </h1>
+                    <br>
+                    <div id="imageContainer">
+                        <label> {특성} 값 입력 시 {라벨}값을 예측합니다. </label>
+                        <label> ['temperature', 'SMM', 'PBF', 'TBW'] </label>
+                    </div>
+                    <br>
+                    <form>
+                        <div class="form-group">
+                            <label for="input1">temperature</label>
+                            <input type="text" class="form-control" id="features1" placeholder="체온을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="input2">SMM</label>
+                            <input type="text" class="form-control" id="features2" placeholder="골격근량을 입력하세요.">
+                        </div>
+                         <div class="form-group">
+                            <label for="input3">PBF</label>
+                            <input type="text" class="form-control" id="features3" placeholder="체지방률을 입력하세요">
+                         </div>
+                        <div class="form-group">
+                            <label for="input4">TBW</label>
+                            <input type="text" class="form-control" id="features4" placeholder="체수분률을 입력하세요">
+                        </div>
+                        <!--<button type="button" class="btn btn-success btn-block" id="downloadBtn1">샘플데이터 다운로드</button>-->
+                        <br>
+                        <button type="button" class="btn btn-primary btn-block" id="prdBtn">분석 시작</button>
+                        <div id=baseResult></div>
+			<!--
+                        <div class="form-group">
+                            <label id="input4">예측결과 </label>
+                        </div>
+			-->
+                     </form>
+                    <div class="mt-4" id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+        <!-- 기존 분석 페이지 내용 -->
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h1 class="mb-3 text-center" style="font-size: 20px;"  > 식후 혈당 예측 </h1>
+                    <br>
+                    <div id="imageContainer">
+                        <label> {특성} 값 입력 시 {라벨}값을 예측합니다. </label>
+                        <label> ['fasting_glucose'] </label>
+                    </div>
+                    <br>
+                    <form>
+                        <div class="form-group">
+                            <label for="input1">fasting_glucose</label>
+                            <input type="text" class="form-control" id="features5" placeholder="공복 혈당을 입력하세요">
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-primary btn-block" id="prdBtn2">분석 시작</button>
+                        <div id=baseResult2></div>
+			<!--
+                        <div class="form-group">
+                            <label id="input4">예측결과 </label>
+                        </div>
+			-->
+                    </form>
+                    <div class="mt-4" id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // 새로운 탭 클릭 시 해당 탭으로 이동하는 함수
+    $(document).ready(function() {
+        $('#new-tab').on('click', function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+        })
+    });
+
+</script>
+<!-- <script>
+    document.getElementById('downloadBtn1').addEventListener('click', function() {
+        var link = document.createElement("a");
+        link.href = "/datas/slab_predict_sample.xlsx"; // 다운로드할 파일의 경로
+        link.download = "slab_predict_sample.xlsx"; // 다운로드될 파일의 이름
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script> -->
+<script>
+    //config.json 파일 로드
+    var newHostname = "3.35.4.255";
+    //var newHostname = "127.0.0.1";
+    var newPort = "9999"
+
+      // 분석시작 버튼 클릭 시 분석서버와 연계 코드
+      $("#prdBtn").click(function(){
+
+        let selectedFeat1 = Number($("#features1").val());
+        let selectedFeat2 = Number($("#features2").val());
+        let selectedFeat3 = Number($("#features3").val());
+        let selectedFeat4 = Number($("#features4").val());
+
+        let urlBase = `http://${newHostname}:${newPort}`;
+
+        let urlFullBase = urlBase+"/predict";
+
+        let reqDataBase = {
+          'temperature': selectedFeat1,
+          'smm': selectedFeat2,
+          'pbf': selectedFeat3,
+          'tbw': selectedFeat4,
+        };
+ 
+        const headersBase = {
+          "Content-Type": "application/json"
+        };
+
+        const dataBase = JSON.stringify(reqDataBase);
+
+        // ['temperature', 'smm', 'pbf', 'tbw']
+        $.ajax({
+          url: urlFullBase,
+          headers: headersBase,
+          data: dataBase,
+          method: 'POST',
+          success: function(data) {
+            console.log(data);
+            // $('#input4').text(${data.result});
+            //$("#baseResult").append(`<div> features1: ${selectedFeat1} features2: ${selectedFeat2} features3: ${selectedFeat3} features4: ${selectedFeat4}=> ${data.result}]</div>`);
+            $("#baseResult").append(`<div> 체온 : ${selectedFeat1} 골격근량 : ${selectedFeat2} 체지방률 : ${selectedFeat3} 체수분률 : ${selectedFeat4} => ${data.result}]</div>`);
+          }
+        });
+      });
+
+      $("#prdBtn2").click(function(){
+        let selectedFeat5 = Number($("#features5").val());
+        let urlBase = `http://${newHostname}:${newPort}`;
+        let urlFullBase = urlBase+"/predict2";
+
+        let reqDataBase = {
+          'fastingGlucose': selectedFeat5
+        };
+
+        const headersBase = {
+          "Content-Type": "application/json"
+        };
+
+        const dataBase = JSON.stringify(reqDataBase);
+
+        $.ajax({
+          url: urlFullBase,
+          headers: headersBase,
+          data: dataBase,
+          method: 'POST',
+          success: function(data) {
+            console.log(data);
+            $("#baseResult2").append(`<div> 공복 혈당 : ${selectedFeat5} => 식후 혈당 : ${data.result}]</div>`);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
